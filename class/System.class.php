@@ -1,4 +1,6 @@
 <?php
+require_once 'TransmissionRPC.class.php';
+
 class Sys
 {
 	//проверяем есть ли интернет
@@ -214,6 +216,21 @@ class Sys
     	$file = '['.$tracker.']_'.$name.'.torrent';
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);
+
+		// Transmission
+        try
+        {
+        	$rpc = new TransmissionRPC('http://5.8.207.77:9091/transmission/rpc', 'Diman', '777');
+        	//$rpc->debug=true;
+        	// Add a torrent using the raw torrent data
+    	    $rpc->add_metainfo($torrent);
+	    	// $id = $result->arguments->torrent_added->id;
+	    	// print "ADD TORRENT TEST... [{$result->result}] (id=$id)\n";
+        } catch (Exception $e) {
+          	//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
+          	print '[ERROR] ' . $e->getMessage() . PHP_EOL;
+		}
+
 
         $torrentClient = Database::getSetting('torrentClient');
         

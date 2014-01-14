@@ -1,4 +1,6 @@
 <?php
+require "class.php-prowl.php";
+
 class Notification
 {
 	private static $headers;
@@ -38,7 +40,25 @@ class Notification
 	public static function send($settingEmail, $date, $tracker, $message, $header_message)
 	{
 		$msg = "Дата: {$date}\nТрекер: {$tracker}\nСообщение: {$message}";
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, self::$headers);		
+		//mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor 2: ".$header_message).'?=', $msg, self::$headers);		
+		// send to Prowl
+		try {
+			$api_key = "6fc74cfe429e4f85af05341d53f4655e11d903fc";
+			$prowl = new Prowl();
+			$prowl->setApiKey($api_key);
+			//$prowl->setDebug(true);
+	
+			$application = "TorrentMonitor";
+			$event = $header_message;
+			$description = $msg;
+			$url = $tracker;
+			$priority = -1;
+	
+			$message = $prowl->add($application,$event,$priority,$description,$url);
+			//echo var_dump($message).DEMO_EOL;		
+		} catch (Exception $message) {
+			echo "Failed: ".$message->getMessage().DEMO_EOL;
+		}	
 	}
 	
 	public static function sendNotification($type, $date, $tracker, $message)
