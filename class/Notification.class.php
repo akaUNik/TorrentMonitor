@@ -30,7 +30,7 @@ class Notification
 			
 		// send to Prowl
 		try {
-			$api_key = "6fc74cfe429e4f85af05341d53f4655e11d903fc";
+			$api_key = Database::getSetting('prowlKey')
 			$prowl = new Prowl();
 			$prowl->setApiKey($api_key);
 			//$prowl->setDebug(true);
