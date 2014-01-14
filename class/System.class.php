@@ -220,7 +220,14 @@ class Sys
 		// Transmission
         try
         {
-        	$rpc = new TransmissionRPC('http://5.8.207.77:9091/transmission/rpc', 'Diman', '777');
+            #получаем настройки из базы
+        	$settings = Database::getAllSetting();
+			foreach ($settings as $row)
+			{
+				extract($row);
+			}
+        
+        	$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
         	//$rpc->debug=true;
         	// Add a torrent using the raw torrent data
     	    $rpc->add_metainfo($torrent);
