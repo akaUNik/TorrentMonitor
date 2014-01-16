@@ -442,7 +442,7 @@ class TransmissionRPC
         $index = $valid_index;
       }
       // Might be an array, check index for digits, if so, an array should be returned
-      if ( ctype_digit( (string) $index ) ) { $return_as_array = true; }
+      if ( is_numeric( (string) $index ) ) { $return_as_array = true; }
       if ( empty( $value ) ) unset( $array[$index] );
     }
     // Return array cast to object
@@ -546,31 +546,19 @@ class TransmissionRPC
     if ( ! $fp = @fopen( $this->url, 'r', false, $context ) )	// Open a filepointer to the data, and use fgets to get the result
       throw new TransmissionRPCException( 'Unable to connect to '.$this->url, TransmissionRPCException::E_CONNECTION );
     
-    fgets ($fp);
-    /*
-    $ln= 0;
-    while ($line= fgets ($fp)) {
-        ++$ln;
-        printf ("%2d: ", $ln);
-        if ($line===FALSE) print ("FALSE\n");
-        else print ($line);
-    }
-	*/
-    
     // Check the response (headers etc)
     $stream_meta = stream_get_meta_data( $fp );
     fclose( $fp );
-    if( $this->debug ) echo "TRANSMISSIONRPC_DEBUG:: GetSessionID():: Stream meta info: substr( stream_meta['wrapper_data'][0], 9, 3 ) = " .substr( $stream_meta['wrapper_data']['headers'][0], 9, 3 ) . PHP_EOL;
     if( $this->debug ) echo "TRANSMISSIONRPC_DEBUG:: GetSessionID():: Stream meta info: ".
                             PHP_EOL . print_r( $stream_meta, true );
     if( $stream_meta['timed_out'] )
       throw new TransmissionRPCException( "Timed out connecting to {$this->url}", TransmissionRPCException::E_CONNECTION );
     if( substr( $stream_meta['wrapper_data'][0], 9, 3 ) == "401" )
       throw new TransmissionRPCException( "Invalid username/password.", TransmissionRPCException::E_AUTHENTICATION );
-    elseif( substr( $stream_meta['wrapper_data']['headers'][0], 9, 3 ) == "409" )	// This is what we're hoping to find
+    elseif( substr( $stream_meta['wrapper_data'][0], 9, 3 ) == "409" )	// This is what we're hoping to find
     {
       // Loop through the returned headers and extract the X-Transmission-Session-Id
-      foreach( $stream_meta['wrapper_data']['headers'] as $header )
+      foreach( $stream_meta['wrapper_data'] as $header )
       {
         if( strpos( $header, 'X-Transmission-Session-Id: ' ) === 0 )
         {
