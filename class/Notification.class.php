@@ -35,7 +35,7 @@ class Notification
 			$prowl->setApiKey($api_key);
 			//$prowl->setDebug(true);
 	
-			$application = "TorrentMonitor";
+			$application = "TorrentMonitor @ www.burdakov.su";
 			$event = $header_message;
 			$description = $msg;
 			$url = $tracker;
