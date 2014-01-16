@@ -91,8 +91,71 @@ class Sys
 		}
 	}
 	
-	//обёртка для CURL, для более удобного использования
+	// обёртка для file_get_contents, для более удобного использования
 	public static function getUrlContent($param = null)
+    {
+    	if (is_array($param))
+    	{
+			$url = $param['url'];
+    				
+			$opts = array(
+			  'http' => array(
+				'method' => $param['type'],
+				'header' => 
+				  	'Host: ' . parse_url($url, PHP_URL_HOST) . PHP_EOL .
+			  		'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:26.0) Gecko/20100101 Firefox/26.0' . PHP_EOL .
+					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . PHP_EOL .
+					'Accept-Language: en-US,en;q=0.5' . PHP_EOL .
+					'Accept-Encoding: deflate' . PHP_EOL .
+					'Cache-Control: max-age=0'
+				)
+			);
+			
+			if (isset($param['referer']))
+    			$opts['http']['header'] .= PHP_EOL . 'Referer: ' . $param['referer'];
+
+    		if (isset($param['cookie']))
+    			$opts['http']['header'] .= PHP_EOL . 'Cookie: ' . $param['cookie'];
+
+			$opts['http']['header'] .= PHP_EOL . 'Connection: keep-alive';
+
+    		if (isset($param['postfields']))
+    		{
+				$opts['http']['header'] .=  PHP_EOL . 'Content-type: application/x-www-form-urlencoded';
+				$opts['http']['header'] .=  PHP_EOL . 'Content-Length: ' . strlen($param['postfields']);
+				$opts['http']['content'] = $param['postfields'];
+    		}
+
+			$context = stream_context_create($opts);
+
+			// Открываем файл с помощью установленных выше HTTP-заголовков
+			$result = file_get_contents($url, false, $context);
+
+			if ($result == FALSE)
+				echo 'file_get_contents failed!!!' . PHP_EOL;
+
+    		if (isset($param['convert']))
+    			$result = iconv($param['convert'][0], $param['convert'][1], $result);
+
+			// debug
+// 			print 'URL: ' . $url . PHP_EOL;
+// 			print_r($opts);
+// 			print '===========================================================' . PHP_EOL;
+//  			print 'result: ' . strlen($result) . PHP_EOL;
+//  			print_r($http_response_header);
+// // 			//file_put_contents(time() . '.html', $result);
+//  			print '===========================================================' . PHP_EOL;
+
+			// если необходимы еще заголовки
+			if (isset($param['header']))
+				return implode("\r\n", $http_response_header) . PHP_EOL . $result;
+			else
+				return $result;
+    	}
+    }
+	
+	//обёртка для CURL, для более удобного использования
+	public static function getUrlContentOld($param = null)
     {
     	if (is_array($param))
     	{
@@ -121,17 +184,23 @@ class Sys
     		if (isset($param['cookie']))
     			curl_setopt($ch, CURLOPT_COOKIE, $param['cookie']);
 
-    		if (isset($param['sendHeader']))
-    		{
-    			foreach ($param['sendHeader'] as $k => $v)
-    			{
-    				$header[] = $k.': '.$v."\r\n";
-    			}
-    			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-    		}		
+			if (isset($param['sendHeader']))
+			{
+					foreach ($param['sendHeader'] as $k => $v)
+					{
+							$header[] = $k.': '.$v;
+					}
+					$header[] = 'Expect:';	// http://pilif.github.io/2007/02/the-return-of-except-100-continue/
+					curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+			}
+			else
+			{
+				$header[] = 'Expect:';	// http://pilif.github.io/2007/02/the-return-of-except-100-continue/
+			}   	
 
     		if (isset($param['referer']))
     			curl_setopt($ch, CURLOPT_REFERER, $param['referer']);
+    		//curl_setopt($ch, CURLOPT_AUTOREFERER,    1);
     			
             $settingProxy = Database::getSetting('proxy');
             if ($settingProxy)
@@ -140,6 +209,9 @@ class Sys
                 curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress); 
                 curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5); 
             }
+
+			// debug
+			curl_setopt($ch, CURLOPT_VERBOSE, true);
 
     		$result = curl_exec($ch);
     		curl_close($ch);
@@ -216,7 +288,7 @@ class Sys
     	$file = '['.$tracker.']_'.$name.'.torrent';
         $path = Database::getSetting('path').$file;
         file_put_contents($path, $torrent);
-
+        
 		// Transmission
         try
         {
@@ -226,13 +298,11 @@ class Sys
 			{
 				extract($row);
 			}
-        
+        	
         	$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
-        	//$rpc->debug=true;
         	// Add a torrent using the raw torrent data
-    	    $rpc->add_metainfo($torrent);
-	    	// $id = $result->arguments->torrent_added->id;
-	    	// print "ADD TORRENT TEST... [{$result->result}] (id=$id)\n";
+    	    $result = $rpc->add_metainfo($torrent);
+    	    print_r($result);
         } catch (Exception $e) {
           	//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
           	print '[ERROR] ' . $e->getMessage() . PHP_EOL;
