@@ -44,10 +44,10 @@ class lostfilm
 			lostfilm::$sess_cookie = $array[1][0]."=".$array[2][0]." ".$array[1][1]."=".$array[2][1];
 			$page = Sys::getUrlContent(
 	        	array(
-	        		'type'           => 'POST',
+	        		'type'           => 'GET',
 	        		'header'         => 0,
 	        		'returntransfer' => 1,
-	        		'url'            => 'http://lostfilm.tv/my.php',
+	        		'url'            => 'http://www.lostfilm.tv/my.php',
 	        		'cookie'         => lostfilm::$sess_cookie,
 	        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 	        		'convert'        => array('windows-1251', 'utf-8'),
@@ -76,7 +76,7 @@ class lostfilm
 	{
         $result = Sys::getUrlContent(
         	array(
-        		'type'           => 'POST',
+        		'type'           => 'GET',
         		'header'         => 0,
         		'returntransfer' => 1,
         		'url'            => 'http://www.lostfilm.tv/',
@@ -338,10 +338,14 @@ class lostfilm
 									$amp = 'MP4';
 								else
 									$amp = NULL;
-								//сохраняем торрент в файл
+								
+								// если в ссылке нет www. - добавляем чтобы избежать переадресации (HTTP/1.1 302 Moved Temporarily)
+								$serial['link']	= str_replace('http://lostfilm.tv/', 'http://www.lostfilm.tv/', $serial['link']);
+								
+								//сохраняем торрент в файл								
                                 $torrent = Sys::getUrlContent(
 						        	array(
-						        		'type'           => 'POST',
+						        		'type'           => 'GET',
 						        		'returntransfer' => 1,
 						        		'url'            => $serial['link'],
 						        		'cookie'         => lostfilm::$sess_cookie,

@@ -10,7 +10,7 @@ class rutracker
 	{
         $result = Sys::getUrlContent(
         	array(
-        		'type'           => 'POST',
+        		'type'           => 'GET',
         		'returntransfer' => 1,
         		'url'            => 'http://rutracker.org/forum/index.php',
         		'cookie'         => $sess_cookie,
@@ -77,24 +77,25 @@ class rutracker
             		'convert'        => array('windows-1251', 'utf-8'),
             	)
             );
-
+			file_put_contents('rutracker-getCookie.html', $page);
 			if ( ! empty($page))
 			{
-				//проверяем подходят ли учётные данные
-				if (preg_match('/profile\.php\?mode=register/', $page, $array))
-				{
-					//устанавливаем варнинг
-					Errors::setWarnings($tracker, 'credential_wrong');
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
-				}
 				//если подходят - получаем куки
-				elseif (preg_match('/bb_data=(.+);/iU', $page, $array))
+				if (preg_match('/bb_data=(.+);/iU', $page, $array))
 				{
 					rutracker::$sess_cookie = 'bb_data='.$array[1].';';
 					Database::setCookie($tracker, rutracker::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					rutracker::$exucution = TRUE;
+				}
+				//проверяем подходят ли учётные данные
+				elseif (preg_match('/profile\.php\?mode=register/', $page, $array))
+				{
+					echo 'credential_wrong!' . PHP_EOL;
+					//устанавливаем варнинг
+					Errors::setWarnings($tracker, 'credential_wrong');
+					//останавливаем процесс выполнения, т.к. не может работать без кук
+					rutracker::$exucution = FALSE;
 				}
 				else
 				{
@@ -152,7 +153,7 @@ class rutracker
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
             	array(
-            		'type'           => 'POST',
+            		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
             		'url'            => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
@@ -184,10 +185,10 @@ class rutracker
 								//сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
                                 	array(
-                                		'type'           => 'POST',
+                                		'type'           => 'GET',
                                 		'returntransfer' => 1,
                                 		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
-                                		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
+                                		'cookie'         => rutracker::$sess_cookie.' bb_dl='.$torrent_id,
                                 		'sendHeader'     => array('Host' => 'dl.rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
                                 		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
                                 	)
