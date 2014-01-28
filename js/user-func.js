@@ -417,7 +417,11 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
+<<<<<<< HEAD
     var a = ['anidub.com', 'baibako.tv', 'kinozal.tv', 'lostfilm.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+=======
+    var a = ['anidub.com', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+>>>>>>> upstream/master
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -434,7 +438,11 @@ function changefunc()
 function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
+<<<<<<< HEAD
     if (tracker == 'baibako.tv')
+=======
+    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv')
+>>>>>>> upstream/master
         $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 720 MP4</span>');

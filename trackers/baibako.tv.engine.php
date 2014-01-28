@@ -66,7 +66,11 @@ class baibako
 	private static function analysis($name, $hd, $item)
 	{
 		if (preg_match('/'.$name.'/i', (string)$item->title))
+<<<<<<< HEAD
 		{echo (string)$item->title."\r\n";
+=======
+		{
+>>>>>>> upstream/master
 			if ($hd == 1)
 			{
 				if (preg_match_all('/HD(TV)?720/', $item->title, $matches))

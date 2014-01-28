@@ -48,7 +48,13 @@ VALUES
 	(6,'tfile.me', ' ', ' ',''),
 	(7,'kinozal.tv', '', '',''),
 	(8,'anidub.com', '', '',''),
+<<<<<<< HEAD
 	(9,'baibako.tv', '', '','');
+=======
+	(9,'baibako.tv', '', '',''),
+	(10,'casstudio.tv', '', '',''),
+	(11,'newstudio.tv', '', '','');
+>>>>>>> upstream/master
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -105,6 +111,7 @@ CREATE TABLE `torrent` (
   `torrent_id` int(9) unsigned NOT NULL DEFAULT '0',
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `hash` varchar(40) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 

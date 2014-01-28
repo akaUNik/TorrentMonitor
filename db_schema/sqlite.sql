@@ -27,6 +27,11 @@ INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ', '');
 INSERT INTO "credentials" VALUES (7, 'kinozal.tv', '', '', '');
 INSERT INTO "credentials" VALUES (8, 'anidub.com', '', '', '');
 INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '');
+<<<<<<< HEAD
+=======
+INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','');
+INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','');
+>>>>>>> upstream/master
 
 CREATE TABLE `settings` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -58,7 +63,8 @@ CREATE TABLE `torrent` (
   `hd` INTEGER NOT NULL DEFAULT '0',
   `torrent_id` INTEGER NOT NULL DEFAULT '0',
   `ep` varchar(10) DEFAULT '',
-  `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00'
+  `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `hash` varchar(40) NOT NULL DEFAULT ''
 );
 
 CREATE TABLE `warning` (
