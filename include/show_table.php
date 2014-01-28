@@ -59,15 +59,9 @@ if ( ! empty($torrents_list))
     		}
     		elseif ($tracker == 'rutor.org')
     		{
-<<<<<<< HEAD
-	    	?>
-	    		<a href="http://<?php echo $tracker ?>/details.php?id=<?php echo $torrent_id ?>" target="_blank"><?php echo $name ?></a>
-	    	<?php	
-=======
     		?>
     			<a href='http://<?php echo $tracker ?>/torrent/<?php echo $torrent_id ?>/' target='_blank'><?php echo $name ?></a>
     		<?php
->>>>>>> upstream/master
     		}
     		elseif ($tracker == 'anidub.com')
     		{
@@ -81,11 +75,7 @@ if ( ! empty($torrents_list))
                     echo '<img src="img/720.png">';
         		elseif ($hd == 2 && $tracker == 'lostfilm.tv')
         			echo '<img src="img/720mp4.png">';
-<<<<<<< HEAD
-                elseif ($hd == 2 && $tracker == 'baibako.tv')
-=======
                 elseif ($hd == 2 && $tracker == 'baibako.tv' || $hd == 2 && $tracker == 'newstudio.tv')
->>>>>>> upstream/master
                     echo '<img src="img/1080.png">';
                 else
                     echo '<img src="img/sd.png">';
