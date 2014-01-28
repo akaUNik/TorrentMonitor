@@ -32,12 +32,8 @@ if (Sys::checkConfig())
 					$class = explode('.', $tracker);
 					$class = $class[0];
 					$functionClass = str_replace('-', '', $class);
-<<<<<<< HEAD
 
-					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv')
-=======
 					if ($tracker == 'lostfilm.tv' || $tracker == 'novafilm.tv' || $tracker == 'baibako.tv' || $tracker == 'newstudio.tv')
->>>>>>> upstream/master
 					{
     				    call_user_func($functionClass.'::main', $torrentsList[$i]['id'], $tracker, $torrentsList[$i]['name'], $torrentsList[$i]['hd'], $torrentsList[$i]['ep'], $torrentsList[$i]['timestamp'], $torrentsList[$i]['hash']);
 					}

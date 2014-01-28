@@ -10,7 +10,7 @@ class casstudio
 	{
         $result = Sys::getUrlContent(
         	array(
-        		'type'           => 'POST',
+        		'type'           => 'GET',
         		'returntransfer' => 1,
         		'url'            => 'http://casstudio.tv/',
         		'cookie'         => $sess_cookie,
@@ -143,7 +143,7 @@ class casstudio
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
             	array(
-            		'type'           => 'POST',
+            		'type'           => 'GET',
             		'header'         => 0,
             		'returntransfer' => 1,
             		'url'            => 'http://casstudio.tv/details.php?id='.$torrent_id,
@@ -176,7 +176,7 @@ class casstudio
     								//сохраняем торрент в файл
                                     $torrent = Sys::getUrlContent(
                                 	array(
-                                		'type'           => 'POST',
+                                		'type'           => 'GET',
                                 		'returntransfer' => 1,
                                 		'url'            => 'http://casstudio.tv/download.php?id='.$torrent_id.'&name='.$link[1].'.torrent',
                                 		'cookie'         => casstudio::$sess_cookie.'; bb_dl='.$torrent_id,

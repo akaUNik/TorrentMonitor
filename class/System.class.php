@@ -1,6 +1,5 @@
 <?php
 require_once 'TransmissionRPC.class.php';
-
 class Sys
 {
 	//проверяем есть ли интернет
@@ -67,7 +66,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.1';
+		return '0.9.2';
 	}
 
 	//проверка обновлений системы
@@ -153,76 +152,7 @@ class Sys
 				return $result;
     	}
     }
-	
-	//обёртка для CURL, для более удобного использования
-	public static function getUrlContentOld($param = null)
-    {
-    	if (is_array($param))
-    	{
-    		$ch = curl_init();
-    		if ($param['type'] == 'POST')
-    			curl_setopt($ch, CURLOPT_POST, 1);
-
-    		if ($param['type'] == 'GET')
-    			curl_setopt($ch, CURLOPT_HTTPGET, 1);
-
-    		curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.7; rv:16.0) Gecko/20100101 Firefox/16.0');
-
-    		if (isset($param['header']))
-    			curl_setopt($ch, CURLOPT_HEADER, 1);
-
-   			curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-
-    		if (isset($param['returntransfer']))
-    			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-    		curl_setopt($ch, CURLOPT_URL, $param['url']);
-
-    		if (isset($param['postfields']))
-    			curl_setopt($ch, CURLOPT_POSTFIELDS, $param['postfields']);
-
-    		if (isset($param['cookie']))
-    			curl_setopt($ch, CURLOPT_COOKIE, $param['cookie']);
-
-			if (isset($param['sendHeader']))
-			{
-					foreach ($param['sendHeader'] as $k => $v)
-					{
-							$header[] = $k.': '.$v;
-					}
-					$header[] = 'Expect:';	// http://pilif.github.io/2007/02/the-return-of-except-100-continue/
-					curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
-			}
-			else
-			{
-				$header[] = 'Expect:';	// http://pilif.github.io/2007/02/the-return-of-except-100-continue/
-			}   	
-
-    		if (isset($param['referer']))
-    			curl_setopt($ch, CURLOPT_REFERER, $param['referer']);
-    		//curl_setopt($ch, CURLOPT_AUTOREFERER,    1);
-    			
-            $settingProxy = Database::getSetting('proxy');
-            if ($settingProxy)
-            {
-                $settingProxyAddress = Database::getSetting('proxyAddress');
-                curl_setopt($ch, CURLOPT_PROXY, $settingProxyAddress); 
-                curl_setopt($ch, CURLOPT_PROXYTYPE, CURLPROXY_SOCKS5); 
-            }
-
-			// debug
-			curl_setopt($ch, CURLOPT_VERBOSE, true);
-
-    		$result = curl_exec($ch);
-    		curl_close($ch);
-
-    		if (isset($param['convert']))
-    			$result = iconv($param['convert'][0], $param['convert'][1], $result);
-
-    		return $result;
-    	}
-    }
-    
+	    
     //Проверяем доступность трекера
     public static function checkavAilability($tracker)
     {
@@ -256,8 +186,8 @@ class Sys
             )
 		);
 
-		if ($tracker != 'rutor.org')
-			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
+		if ($tracker != 'rutor.org' && $tracker != 'casstudio.tv')
+			$forumPage = iconv('windows-1251', 'utf-8', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
@@ -268,6 +198,8 @@ class Sys
 			$name = $array[1];
 			if ($tracker == 'anidub.com')
 				$name = substr($name, 15, -50);
+			if ($tracker == 'casstudio.tv')
+				$name = substr($name, 48);
 			if ($tracker == 'kinozal.tv')
 				$name = substr($name, 0, -22);
 			if ($tracker == 'nnm-club.me')
