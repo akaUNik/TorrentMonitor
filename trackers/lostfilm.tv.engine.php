@@ -19,7 +19,7 @@ class lostfilm
 		}
 		if ($type == 'hard')
 		{
-			$url = 'http://login.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F';
+			$url = 'http://login1.bogi.ru/login.php?referer=http%3A%2F%2Fwww.lostfilm.tv%2F';
 			$postfields = 'login='.$login.'&password='.$password.'&module=1&target=http%3A%2F%2Flostfilm.tv%2F&repage=user&act=login';
 		}
 
@@ -50,7 +50,7 @@ class lostfilm
 	        		'url'            => 'http://www.lostfilm.tv/my.php',
 	        		'cookie'         => lostfilm::$sess_cookie,
 	        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
-	        		'convert'        => array('windows-1251', 'utf-8'),
+	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 	        	)
 	        );
 			preg_match('/<td align=\"left\">(.*)<br >/', $page, $out);
@@ -82,7 +82,7 @@ class lostfilm
         		'url'            => 'http://www.lostfilm.tv/',
         		'cookie'         => $sess_cookie,
         		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -157,9 +157,13 @@ class lostfilm
 				if (preg_match_all('/MP4/', $item->title, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
-			else
+			elseif ($hd == 3)
 			{
-				if (preg_match_all('/^(?!(.*720|.*HD))/', $item->link, $matches))
+				if (preg_match_all('/1080/', $item->title, $matches))
+					return lostfilm::analysisEpisode($item);
+			}			else
+			{
+				if (preg_match_all('/^(?!(.*720|.*HD|.*1080))/', $item->link, $matches))
 					return lostfilm::analysisEpisode($item);
 			}
 		}
@@ -172,11 +176,11 @@ class lostfilm
 		{
 			//получаем учётные данные
 			$credentials = Database::getCredentials($tracker);
-			$login = iconv("utf-8", "windows-1251", $credentials['login']);
+			$login = iconv('utf-8', 'windows-1251', $credentials['login']);
 			$password = $credentials['password'];
 			
 			$page = lostfilm::login('simple', $login, $password);
-			if (preg_match_all("/Set-Cookie: (\w*)=(\S*)/", $page, $array))
+			if (preg_match_all('/Set-Cookie: (\w*)=(\S*)/', $page, $array))
 			{
 				lostfilm::getCookies($tracker, $array);
 				lostfilm::$exucution = TRUE;
@@ -202,7 +206,7 @@ class lostfilm
 		        		'returntransfer' => 1,
 		        		'url'            => 'http://www.lostfilm.tv/blg.php?ref=aHR0cDovL3d3dy5sb3N0ZmlsbS50di8=',
 		        		'postfields'     => $post,
-		        		'convert'        => array('windows-1251', 'utf-8'),
+		        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 		        	)
 		        );
 
@@ -212,6 +216,7 @@ class lostfilm
 					lostfilm::$exucution = TRUE;
 				}	
 			}
+			
 		}
 		else
 		{
@@ -257,7 +262,7 @@ class lostfilm
 			        		'type'           => 'GET',
 			        		'returntransfer' => 1,
 			        		'url'            => 'http://www.lostfilm.tv/rssdd.xml',
-			        		'convert'        => array('windows-1251', 'utf-8'),
+			        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
 			        	)
 			        );
 			        
@@ -332,7 +337,7 @@ class lostfilm
 							
 							if ($download)
 							{
-								if ($hd == 1)
+								if ($hd == 1 || $hd == 3)
 									$amp = 'HD';
 								elseif ($hd == 2)
 									$amp = 'MP4';

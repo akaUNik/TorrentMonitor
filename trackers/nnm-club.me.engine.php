@@ -10,12 +10,12 @@ class nnmclub
 	{
         $result = Sys::getUrlContent(
         	array(
-        		'type'           => 'GET',// FIX
+        		'type'           => 'GET',
         		'returntransfer' => 1,
         		'url'            => 'http://nnm-club.me/forum/index.php',
         		'cookie'         => $sess_cookie,
-        		//FIX 'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-Length' => strlen($sess_cookie)),
-        		'convert'        => array('windows-1251', 'utf-8'),
+        		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen($sess_cookie)),
+        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
 
@@ -37,7 +37,7 @@ class nnmclub
 	private static function dateStringToNum($data)
 	{
 		$monthes = array('Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек');
-		$month = mb_substr($data, 4, 3);	//FIX
+		$month = mb_substr($data, 3, 6);
 		$date = preg_replace('/(\d\d)\s(\d\d)\s(\d\d\d\d)/', '$3-$2-$1',str_replace($month, str_pad(array_search($month, $monthes)+1, 2, 0, STR_PAD_LEFT), $data));
 		$date = date('Y-m-d H:i:s', strtotime($date));
 	
@@ -70,7 +70,7 @@ class nnmclub
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/login.php',
             		'postfields'     => 'username='.$login.'&password='.$password.'&login=%C2%F5%EE%E4',
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
 			
@@ -78,7 +78,7 @@ class nnmclub
 			{
 				//проверяем подходят ли учётные данные
 				if (preg_match('/login\.php\?redirect=/', $page, $array))
-				{				
+				{
 					//устанавливаем варнинг
 					if (nnmclub::$warning == NULL)
 					{
@@ -143,21 +143,21 @@ class nnmclub
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
             	array(
-            		'type'           => 'GET',//FIX
-            		//'header'         => 0,
+            		'type'           => 'GET',
+            		'header'         => 0,
             		'returntransfer' => 1,
             		'url'            => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
             		'cookie'         => nnmclub::$sess_cookie,
-            		//'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-Length' => strlen(nnmclub::$sess_cookie)),
-            		'sendHeader'     => array('Host' => 'nnm-club.me'),
-            		'convert'        => array('windows-1251', 'utf-8'),
+            		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
+            		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
+
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<td class=\"genmed\">&nbsp;(\d{2}\s\D{3}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/u', $page, $array))	// FIX
-				{	
+				if (preg_match('/<td class=\"genmed\">&nbsp;(\d{2}\s\D{6}\s\d{4}\s\d{2}:\d{2}:\d{2})<\/td>/', $page, $array))
+				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
 					{
@@ -167,7 +167,6 @@ class nnmclub
 							//находим имя торрента для скачивания		
 							if (preg_match('/download\.php\?id=(\d{6,8})/', $page, $link))
 							{
-
 								//сбрасываем варнинг
 								Database::clearWarnings($tracker);
 								//приводим дату к общему виду
@@ -184,7 +183,7 @@ class nnmclub
 	                                		'returntransfer' => 1,
 	                                		'url'            => 'http://nnm-club.me/forum/download.php?id='.$torrent_id,
 	                                		'cookie'         => nnmclub::$sess_cookie,
-	                                		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-Length' => strlen(nnmclub::$sess_cookie)),
+	                                		'sendHeader'     => array('Host' => 'nnm-club.me', 'Content-length' => strlen(nnmclub::$sess_cookie)),
 	                                		'referer'        => 'http://nnm-club.me/forum/viewtopic.php?t='.$torrent_id,
 	                                	)
 	                                );
@@ -234,8 +233,6 @@ class nnmclub
 				}
 				else
 				{
-					echo 'ERROR: match not found!!!1';
-					print_r($array);
 					//устанавливаем варнинг
 					if (nnmclub::$warning == NULL)
         			{

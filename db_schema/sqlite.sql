@@ -31,6 +31,10 @@ INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '');
 =======
 INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','');
+<<<<<<< HEAD
+>>>>>>> upstream/master
+=======
+INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','');
 >>>>>>> upstream/master
 
 CREATE TABLE `settings` (
@@ -61,6 +65,7 @@ CREATE TABLE `torrent` (
   `tracker` varchar(30) NOT NULL,
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` INTEGER NOT NULL DEFAULT '0',
+  `path` varchar(1000) NOT NULL DEFAULT '',
   `torrent_id` INTEGER NOT NULL DEFAULT '0',
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
