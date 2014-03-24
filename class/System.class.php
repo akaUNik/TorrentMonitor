@@ -66,7 +66,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '0.9.4';
+		return '0.9.5';
 	}
 
 	//проверка обновлений системы
