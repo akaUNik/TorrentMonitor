@@ -17,7 +17,6 @@ $(function()
         $(this).toggleClass("active");
         $(this).next().toggle();
     });
-
 });
 
 // Меню
@@ -28,16 +27,17 @@ $(".h-menu li").click(function() {
     $(this).addClass("active");
 });
 
-
 //Подгрузка страниц
 function show(name)
 {
-	$.get("include/"+name+".php",
-		function(data) {
-			$('#content').empty().append(data);
-		}
-	);
-	
+    if (name == 'check' || name == 'execution' || name == 'update')
+        $('#content').empty().append('<img src="img/ajax-loader.gif" class="loader">');
+
+    $.get("include/"+name+".php",
+        function(data) {
+            $('#content').empty().append(data);
+    });
+
 	if (name == 'show_table')
 	{
 		window.clearTimeout(this.timeoutID);
@@ -53,7 +53,7 @@ function show(name)
 		window.clearTimeout(this.timeoutID);
 		delete this.timeoutID;
 	}
-		
+	
 	return false;
 }
 
@@ -319,19 +319,19 @@ $("#setting").submit(function()
 		s = $form.find('input[type=submit]'),
 		p = $form.find('input[name="path"]').val(),
 		e = $form.find('input[name="email"]').val(),
-		s = $form.find('input[name="send"]').attr('checked');
-		s_w = $form.find('input[name="send_warning"]').attr('checked');
-		a = $form.find('input[name="auth"]').attr('checked');
-		pr = $form.find('input[name="proxy"]').attr('checked');
+		s = $form.find('input[name="send"]').prop('checked');
+		s_w = $form.find('input[name="send_warning"]').prop('checked');
+		a = $form.find('input[name="auth"]').prop('checked');
+		pr = $form.find('input[name="proxy"]').prop('checked');
 		pa = $form.find('input[name="proxyAddress"]').val();
-		t = $form.find('input[name="torrent"]').attr('checked');
+		t = $form.find('input[name="torrent"]').prop('checked');
 		tc = $form.find('select[name="torrentClient"]').val();
 		ta = $form.find('input[name="torrentAddress"]').val();
 		tl = $form.find('input[name="torrentLogin"]').val();
 		tp = $form.find('input[name="torrentPassword"]').val();
 		ptd = $form.find('input[name="pathToDownload"]').val();
-		dt = $form.find('input[name="deleteTorrent"]').attr('checked');
-		dof = $form.find('input[name="deleteOldFiles"]').attr('checked');
+		dt = $form.find('input[name="deleteTorrent"]').prop('checked');
+		dof = $form.find('input[name="deleteOldFiles"]').prop('checked');
 	
 	if (p == '')
 	{
@@ -415,7 +415,7 @@ function changefunc()
 {
     var select = document.getElementById("selectfunc");
     var selectedText = select.options[select.selectedIndex].text;
-    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'rutracker.org'];
+    var a = ['anidub.com', 'animelayer.ru', 'baibako.tv', 'casstudio.tv', 'kinozal.tv', 'lostfilm.tv', 'newstudio.tv', 'nnm-club.me', 'novafilm.tv', 'pornolab.net', 'rustorka.com', 'rutracker.org', 'tracker.0day.kiev.ua'];
     for (var i = 0; i < a.length; i++)
     {
         var e = a[i];
@@ -432,12 +432,10 @@ function changefunc()
 function changeField()
 {
 	var tracker = document.getElementById("tracker").value;
-    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv')
+    if (tracker == 'baibako.tv' || tracker == 'newstudio.tv' || tracker == 'novafilm.tv')
         $('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720<br /><input type="radio" name="hd" value="2"> HD 1080</span>');
 	if (tracker == 'lostfilm.tv')
 		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> Автовыбор HD 720/1080<br /><input type="radio" name="hd" value="2"> HD 720 MP4');
-	if (tracker == 'novafilm.tv')
-		$('#changedField').empty().append('<span class="quality"><input type="radio" name="hd" value="0"> SD<br /><input type="radio" name="hd" value="1"> HD 720</span>');
 }
 
 //Показать/скрыть настройки proxy

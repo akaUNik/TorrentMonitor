@@ -47,6 +47,7 @@ class kinozal
 	        $date = date('Y-m-d', $timestamp);
 	        $time = $pieces[2].':00';
 	        $dateTime = $date.' '.$time;
+
 	        return $dateTime;
 	    }
 	    elseif (preg_match('/\d{1,2} \D* \d{4} в \d{2}:\d{2}/', $data))
@@ -58,11 +59,31 @@ class kinozal
 			$date = $pieces[2].'-'.$month.'-'.$pieces[0];
 			$time = $pieces[4].':00';
 			$dateTime = $date.' '.$time;
+
 			return $dateTime;
 	    }
-	    
 	}
-	
+
+	//функция преобразования даты
+	private static function dateNumToString($data)
+	{
+	    if (strstr($data, 'сегодня') || strstr($data, 'вчера'))
+	    {
+	        $pieces = explode(' ', $data);
+	        if ($pieces[0] == 'вчера')
+	            $timestamp = strtotime('-1 day');
+	        else         
+	            $timestamp = strtotime('now');
+	        $day = date('d', $timestamp);
+			$month = Sys::dateNumToString(date('m', $timestamp));
+			$year = date('Y', $timestamp);
+	        $dateTime = $day.' '.$month.' '.$year.' в '.$pieces[2];
+	        return $dateTime;
+	    }
+	   	else
+			return $data;
+	}	
+
 	//функция получения кук
 	protected static function getCookie($tracker)
 	{
@@ -154,7 +175,7 @@ class kinozal
 				Database::clearWarnings($tracker);
 				//приводим дату к общему виду
 				$date = kinozal::dateStringToNum($array[1]);
-				$date_str = $array[1];
+				$date_str = kinozal::dateNumToString($array[1]);
 				//если даты не совпадают, перекачиваем торрент
 				if ($date != $timestamp)
 				{
@@ -182,12 +203,17 @@ class kinozal
 					}
 					else
 					{
-    					Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash);
+    					$message = $name.' обновлён.';
+    					$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
+								
+						if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
+						{
+						    $torrentClient = Database::getSetting('torrentClient');
+						    Errors::setWarnings($torrentClient, $status);
+						}
+						
     					//обновляем время регистрации торрента в базе
     					Database::setNewDate($id, $date);
-    					//отправляем уведомлении о новом торренте
-    					$message = $name.' обновлён.';
-    					Notification::sendNotification('notification', $date_str, $tracker, $message);
     				}
 				}
 			}
@@ -239,7 +265,7 @@ class kinozal
             		'returntransfer' => 1,
             		'url'            => 'http://kinozal.tv/details.php?id='.$torrent_id,
             		'cookie'         => kinozal::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(kinozal::$sess_cookie)),
+            		'sendHeader'     => array('Host' => 'kinozal.tv', 'Content-length' => strlen(kinozal::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );			

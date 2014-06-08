@@ -1,22 +1,22 @@
 <?php
-include_once('rutracker.org.engine.php');
+include_once('pornolab.net.engine.php');
 
-class rutrackerSearch extends rutracker
+class pornolabSearch extends pornolab
 {
 	//ищем темы пользователя
 	public static function mainSearch($user_id, $tracker, $user)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (rutracker::checkCookie($cookie))
+		if (pornolab::checkCookie($cookie))
 		{
-			rutracker::$sess_cookie = $cookie;
+			pornolab::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			rutracker::$exucution = TRUE;
+			pornolab::$exucution = TRUE;
 		}
 		else
-    		rutracker::getCookie($tracker);
+    		pornolab::getCookie($tracker);
 
-		if (rutracker::$exucution)
+		if (pornolab::$exucution)
 		{
     		$user = iconv('utf-8', 'windows-1251', $user);
     		$page = Sys::getUrlContent(
@@ -24,9 +24,9 @@ class rutrackerSearch extends rutracker
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutracker.org/forum/tracker.php',
-            		'cookie'         => rutracker::$sess_cookie,
-            		'postfields'     => 'prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn='.$user.'&nm=',
+            		'url'            => 'http://pornolab.net/forum/tracker.php',
+            		'cookie'         => pornolab::$sess_cookie,
+            		'postfields'     => 'prev_my=0&prev_new=0&prev_oop=0&f%5B%5D=-1&o=1&s=2&tm=-1&pn='.$user.'&nm=&submit=%CF%EE%E8%F1%EA',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
 	        );
@@ -37,7 +37,7 @@ class rutrackerSearch extends rutracker
 				Database::clearWarnings($tracker);
 
 	    		preg_match_all('/<a class=\"gen f\" href=\"tracker\.php\?f=\d{1,9}\">(.*)<\/a>/', $page, $section);
-	    		preg_match_all('/<a data-topic_id=\"\d{3,9}\" class=\"med tLink hl-tags bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
+	    		preg_match_all('/<a class=\"med tLink bold\" href=\"\.\/viewtopic.php\?t=(\d{3,9})\">(.*)<\/a>/', $page, $threme);
 	
 	    		for ($i=0; $i<count($threme[1]); $i++)
 	    			Database::addThremeToBuffer($user_id, $section[1][$i], $threme[1][$i], $threme[2][$i], $tracker);
@@ -58,10 +58,10 @@ class rutrackerSearch extends rutracker
                     	array(
                     		'type'           => 'POST',
                     		'returntransfer' => 1,
-                    		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
-                    		'cookie'         => rutracker::$sess_cookie.'; bb_dl='.$torrent_id,
-                    		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
-                    		'referer'        => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
+                    		'url'            => 'http://pornolab.net/forum/dl.php?t='.$torrent_id,
+                    		'cookie'         => pornolab::$sess_cookie.'; bb_dl='.$torrent_id,
+                    		'sendHeader'     => array('Host' => 'pornolab', 'Content-length' => strlen(pornolab::$sess_cookie.'; bb_dl='.$torrent_id)),
+                    		'referer'        => 'http://pornolab.net/forum/viewtopic.php?t='.$torrent_id,
                     	)
                     );
     				$message = $toDownload[$i]['threme'].' добавлена для скачивания.';

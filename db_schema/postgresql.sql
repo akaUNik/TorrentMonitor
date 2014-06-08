@@ -17,7 +17,7 @@ CREATE TABLE "credentials" (
   "tracker" varchar(30) DEFAULT NULL,
   "log" varchar(30) DEFAULT NULL,
   "pass" varchar(30) DEFAULT NULL,
-  "cookie" varchar(30) DEFAULT NULL
+  "cookie" varchar(255) DEFAULT NULL
 );
 
 INSERT INTO credentials VALUES (1, 'rutracker.org', '', '', '');
@@ -29,15 +29,12 @@ INSERT INTO credentials VALUES (6, 'tfile.me', ' ', ' ', '');
 INSERT INTO credentials VALUES (7, 'kinozal.tv', '', '', '');
 INSERT INTO credentials VALUES (8, 'anidub.com', '', '', '');
 INSERT INTO credentials VALUES (9, 'baibako.tv', '', '', '');
-<<<<<<< HEAD
-=======
 INSERT INTO credentials VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO credentials VALUES (11,'newstudio.tv', '', '','');
-<<<<<<< HEAD
->>>>>>> upstream/master
-=======
 INSERT INTO credentials VALUES (12,'animelayer.ru', '', '','');
->>>>>>> upstream/master
+INSERT INTO credentials VALUES (13,'tracker.0day.kiev.ua','','','');
+INSERT INTO credentials VALUES (14,'rustorka.com','','','');
+INSERT INTO credentials VALUES (15,'pornolab.net','','','');
 
 CREATE TABLE "settings" (
   "id" INTEGER  PRIMARY KEY NOT NULL,
@@ -62,6 +59,18 @@ INSERT INTO settings VALUES (14, 'pathToDownload', '');
 INSERT INTO settings VALUES (15, 'deleteTorrent', '0');
 INSERT INTO settings VALUES (16, 'deleteOldFiles', '0');
 
+CREATE SEQUENCE auto_id_temp;
+
+CREATE TABLE "temp" (
+  "id" INTEGER PRIMARY KEY NOT NULL DEFAULT nextval('auto_id_temp'),
+  "path" varchar(100) DEFAULT NULL,
+  "hash" varchar(40) DEFAULT NULL,
+  "tracker" varchar(30) DEFAULT NULL,
+  "message" varchar(60) DEFAULT NULL,
+  "date" varchar(120) DEFAULT NULL,
+  UNIQUE(hash)
+)
+
 CREATE SEQUENCE auto_id_torrent;
 
 CREATE TABLE "torrent" (
@@ -70,7 +79,7 @@ CREATE TABLE "torrent" (
   "name" varchar(250) NOT NULL DEFAULT '',
   "hd" INTEGER NOT NULL DEFAULT '0',
   "path" varchar(100) NOT NULL,
-  "torrent_id" INTEGER NOT NULL DEFAULT '0',
+  "torrent_id" varchar(100) NOT NUL,
   "ep" varchar(10) DEFAULT '',
   "timestamp" timestamp,
   "hash" varchar(40) NOT NULL DEFAULT '0'

@@ -50,7 +50,7 @@ if (Sys::checkInternet())
 		<tr>			
 			<?php	
 			}
-			$dir = str_replace('include', '', __DIR__);
+			$dir = str_replace('include', '', dirname(__FILE__));
 			if (Sys::checkWriteToPath($dir))
 			{
 			?>
@@ -87,7 +87,7 @@ if (Sys::checkInternet())
 		<tr>
 				<?php	
 				}
-				if ($tracker == 'nnm-club.me' || $tracker == 'rutracker.org' || $tracker == 'tapochek.net' || $tracker == 'tfile.me')
+				if ($tracker == 'nnm-club.me' || $tracker == 'pornolab.net' || $tracker == 'rutracker.org' || $tracker == 'tapochek.net' || $tracker == 'tfile.me')
 				{
 					if (file_exists($dir.'trackers/'.$tracker.'.search.php'))
 					{

@@ -48,18 +48,14 @@ VALUES
 	(6,'tfile.me', ' ', ' ',''),
 	(7,'kinozal.tv', '', '',''),
 	(8,'anidub.com', '', '',''),
-<<<<<<< HEAD
-	(9,'baibako.tv', '', '','');
-=======
 	(9,'baibako.tv', '', '',''),
 	(10,'casstudio.tv', '', '',''),
-<<<<<<< HEAD
-	(11,'newstudio.tv', '', '','');
->>>>>>> upstream/master
-=======
 	(11,'newstudio.tv', '', '',''),
-	(12,'animelayer.ru', '', '','');
->>>>>>> upstream/master
+	(12,'animelayer.ru', '', '',''),
+	(13,'tracker.0day.kiev.ua','','',''),
+	(14,'rustorka.com','','',''),
+	(15,'pornolab.net','','','');)
+
 
 /*!40000 ALTER TABLE `credentials` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -103,6 +99,22 @@ VALUES
 UNLOCK TABLES;
 
 
+# Дамп таблицы temp
+# ------------------------------------------------------------
+
+DROP TABLE IF EXISTS `temp`;
+
+CREATE TABLE `temp` (
+  `id` int(11) unsigned NOT NULL,
+  `path` varchar(100) DEFAULT NULL,
+  `hash` varchar(40) DEFAULT NULL,
+  `tracker` varchar(30) DEFAULT NULL,
+  `message` varchar(60) DEFAULT NULL,
+  `date` varchar(120) DEFAULT NULL,
+  UNIQUE KEY `hash` (`hash`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
 # Дамп таблицы torrent
 # ------------------------------------------------------------
 
@@ -114,7 +126,7 @@ CREATE TABLE `torrent` (
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `path` varchar(100) NOT NULL,
-  `torrent_id` int(9) unsigned NOT NULL DEFAULT '0',
+  `torrent_id` varchar(100) NOT NULL,
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hash` varchar(40) NOT NULL DEFAULT '',

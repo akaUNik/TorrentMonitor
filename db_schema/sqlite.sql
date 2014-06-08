@@ -27,15 +27,12 @@ INSERT INTO "credentials" VALUES (6, 'tfile.me', ' ', ' ', '');
 INSERT INTO "credentials" VALUES (7, 'kinozal.tv', '', '', '');
 INSERT INTO "credentials" VALUES (8, 'anidub.com', '', '', '');
 INSERT INTO "credentials" VALUES (9, 'baibako.tv', '', '', '');
-<<<<<<< HEAD
-=======
 INSERT INTO "credentials" VALUES (10,'casstudio.tv', '', '','');
 INSERT INTO "credentials" VALUES (11,'newstudio.tv', '', '','');
-<<<<<<< HEAD
->>>>>>> upstream/master
-=======
 INSERT INTO "credentials" VALUES (12,'animelayer.ru', '', '','');
->>>>>>> upstream/master
+INSERT INTO "credentials" VALUES (13,'tracker.0day.kiev.ua','','','');
+INSERT INTO "credentials" VALUES (14,'rustorka.com','','','');
+INSERT INTO "credentials" VALUES (15,'pornolab.net','','','');
 
 CREATE TABLE `settings` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
@@ -60,13 +57,22 @@ INSERT INTO "settings" VALUES (14, 'pathToDownload', '');
 INSERT INTO "settings" VALUES (15, 'deleteTorrent', '0');
 INSERT INTO "settings" VALUES (16, 'deleteOldFiles', '0');
 
+CREATE TABLE `temp` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  `path` varchar(100) NOT NULL DEFAULT '',
+  `hash` varchar(40) NOT NULL DEFAULT '' UNIQUE,
+  `tracker` varchar(30) NOT NULL DEFAULT '',
+  `message` varchar(60) NOT NULL DEFAULT '',
+  `date` varchar(120) NOT NULL DEFAULT '',
+)
+
 CREATE TABLE `torrent` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
   `tracker` varchar(30) NOT NULL,
   `name` varchar(250) NOT NULL DEFAULT '',
   `hd` INTEGER NOT NULL DEFAULT '0',
-  `path` varchar(1000) NOT NULL DEFAULT '',
-  `torrent_id` INTEGER NOT NULL DEFAULT '0',
+  `path` varchar(100) NOT NULL DEFAULT '',
+  `torrent_id` varchar(100) NOT NULL DEFAULT '',
   `ep` varchar(10) DEFAULT '',
   `timestamp` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
   `hash` varchar(40) NOT NULL DEFAULT ''

@@ -1,5 +1,5 @@
 <?php
-class rutracker
+class pornolab
 {
 	protected static $sess_cookie;
 	protected static $exucution;
@@ -10,11 +10,11 @@ class rutracker
 	{
         $result = Sys::getUrlContent(
         	array(
-        		'type'           => 'GET',
+        		'type'           => 'POST',
         		'returntransfer' => 1,
-        		'url'            => 'http://rutracker.org/forum/index.php',
+        		'url'            => 'http://pornolab.net/forum/index.php',
         		'cookie'         => $sess_cookie,
-        		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen($sess_cookie)),
+        		'sendHeader'     => array('Host' => 'pornolab.net', 'Content-length' => strlen($sess_cookie)),
         		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
         	)
         );
@@ -72,70 +72,65 @@ class rutracker
             		'type'           => 'POST',
             		'header'         => 1,
             		'returntransfer' => 1,
-            		'url'            => 'http://login.rutracker.org/forum/login.php',
+            		'url'            => 'http://pornolab.net/forum/login.php',
             		'postfields'     => 'login_username='.$login.'&login_password='.$password.'&login=%C2%F5%EE%E4',
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
-			file_put_contents('rutracker-getCookie.html', $page);
+
 			if ( ! empty($page))
 			{
-				//если подходят - получаем куки
-<<<<<<< HEAD
-				if (preg_match('/bb_data=(.+);/iU', $page, $array))
-=======
-				elseif (preg_match('/bb_data=.+;/U', $page, $array))
->>>>>>> upstream/master
-				{
-					rutracker::$sess_cookie = $array[0];
-					Database::setCookie($tracker, rutracker::$sess_cookie);
-					//запускам процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = TRUE;
-				}
 				//проверяем подходят ли учётные данные
-				elseif (preg_match('/profile\.php\?mode=register/', $page, $array))
+				if (preg_match('/Вы ввели неверное\/неактивное имя пользователя или неверный пароль/', $page, $array))
 				{
-					echo 'credential_wrong!' . PHP_EOL;
 					//устанавливаем варнинг
 					Errors::setWarnings($tracker, 'credential_wrong');
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					pornolab::$exucution = FALSE;
+				}
+				//если подходят - получаем куки
+				elseif (preg_match('/bb_data=.+;/U', $page, $array))
+				{
+					pornolab::$sess_cookie = $array[0];
+					Database::setCookie($tracker, pornolab::$sess_cookie);
+					//запускам процесс выполнения, т.к. не может работать без кук
+					pornolab::$exucution = TRUE;
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (pornolab::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						pornolab::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					pornolab::$exucution = FALSE;
 				}
 			}
 			//если вообще ничего не найдено
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (pornolab::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					pornolab::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				pornolab::$exucution = FALSE;
 			}
 		}
 		else
 		{
 			//устанавливаем варнинг
-			if (rutracker::$warning == NULL)
+			if (pornolab::$warning == NULL)
 			{
-				rutracker::$warning = TRUE;
+				pornolab::$warning = TRUE;
 				Errors::setWarnings($tracker, 'credential_miss');
 			}
 			//останавливаем процесс выполнения, т.к. не может работать без кук
-			rutracker::$exucution = FALSE;
+			pornolab::$exucution = FALSE;
 		}
 	}
 
@@ -143,26 +138,26 @@ class rutracker
 	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
 	{
 		$cookie = Database::getCookie($tracker);
-		if (rutracker::checkCookie($cookie))
+		if (pornolab::checkCookie($cookie))
 		{
-			rutracker::$sess_cookie = $cookie;
+			pornolab::$sess_cookie = $cookie;
 			//запускам процесс выполнения
-			rutracker::$exucution = TRUE;
+			pornolab::$exucution = TRUE;
 		}
 		else
-    		rutracker::getCookie($tracker);
+    		pornolab::getCookie($tracker);
 
-		if (rutracker::$exucution)
+		if (pornolab::$exucution)
 		{
 			//получаем страницу для парсинга
             $page = Sys::getUrlContent(
             	array(
-            		'type'           => 'GET',
+            		'type'           => 'POST',
             		'header'         => 0,
             		'returntransfer' => 1,
-            		'url'            => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
-            		'cookie'         => rutracker::$sess_cookie,
-            		'sendHeader'     => array('Host' => 'rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie)),
+            		'url'            => 'http://pornolab.net/forum/viewtopic.php?t='.$torrent_id,
+            		'cookie'         => pornolab::$sess_cookie,
+            		'sendHeader'     => array('Host' => 'pornolab.net', 'Content-length' => strlen(pornolab::$sess_cookie)),
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
@@ -170,7 +165,7 @@ class rutracker
 			if ( ! empty($page))
 			{
 				//ищем на странице дату регистрации торрента
-				if (preg_match('/<span title=\"Когда зарегистрирован\">\[ (.+) \]<\/span>/', $page, $array))
+				if (preg_match('/<span title=\"Зарегистрирован\">\[ (.+) \]<\/span>/', $page, $array))
 				{
 					//проверяем удалось ли получить дату со страницы
 					if (isset($array[1]))
@@ -181,20 +176,20 @@ class rutracker
 							//сбрасываем варнинг
 							Database::clearWarnings($tracker);
 							//приводим дату к общему виду
-							$date = rutracker::dateStringToNum($array[1]);
-							$date_str = rutracker::dateNumToString($array[1]);
+							$date = pornolab::dateStringToNum($array[1]);
+							$date_str = pornolab::dateNumToString($array[1]);
 							//если даты не совпадают, перекачиваем торрент
 							if ($date != $timestamp)
 							{
 								//сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
                                 	array(
-                                		'type'           => 'GET',
+                                		'type'           => 'POST',
                                 		'returntransfer' => 1,
-                                		'url'            => 'http://dl.rutracker.org/forum/dl.php?t='.$torrent_id,
-                                		'cookie'         => rutracker::$sess_cookie.' bb_dl='.$torrent_id,
-                                		'sendHeader'     => array('Host' => 'dl.rutracker.org', 'Content-length' => strlen(rutracker::$sess_cookie.'; bb_dl='.$torrent_id)),
-                                		'referer'        => 'http://rutracker.org/forum/viewtopic.php?t='.$torrent_id,
+                                		'url'            => 'http://pornolab.net/forum/dl.php?t='.$torrent_id,
+                                		'cookie'         => pornolab::$sess_cookie.'; bb_dl='.$torrent_id,
+                                		'sendHeader'     => array('Host' => 'pornolab', 'Content-length' => strlen(pornolab::$sess_cookie.'; bb_dl='.$torrent_id)),
+                                		'referer'        => 'http://pornolab.net/forum/viewtopic.php?t='.$torrent_id,
                                 	)
                                 );
 								$message = $name.' обновлён.';
@@ -213,49 +208,49 @@ class rutracker
 						else
 						{
 							//устанавливаем варнинг
-							if (rutracker::$warning == NULL)
+							if (pornolab::$warning == NULL)
 							{
-								rutracker::$warning = TRUE;
+								pornolab::$warning = TRUE;
 								Errors::setWarnings($tracker, 'not_available');
 							}
 							//останавливаем процесс выполнения, т.к. не может работать без кук
-							rutracker::$exucution = FALSE;
+							pornolab::$exucution = FALSE;
 						}
 					}
 					else
 					{
 						//устанавливаем варнинг
-						if (rutracker::$warning == NULL)
+						if (pornolab::$warning == NULL)
 						{
-							rutracker::$warning = TRUE;
+							pornolab::$warning = TRUE;
 							Errors::setWarnings($tracker, 'not_available');
 						}
 						//останавливаем процесс выполнения, т.к. не может работать без кук
-						rutracker::$exucution = FALSE;
+						pornolab::$exucution = FALSE;
 					}
 				}
 				else
 				{
 					//устанавливаем варнинг
-					if (rutracker::$warning == NULL)
+					if (pornolab::$warning == NULL)
 					{
-						rutracker::$warning = TRUE;
+						pornolab::$warning = TRUE;
 						Errors::setWarnings($tracker, 'not_available');
 					}
 					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
+					pornolab::$exucution = FALSE;
 				}
 			}
 			else
 			{
 				//устанавливаем варнинг
-				if (rutracker::$warning == NULL)
+				if (pornolab::$warning == NULL)
 				{
-					rutracker::$warning = TRUE;
+					pornolab::$warning = TRUE;
 					Errors::setWarnings($tracker, 'not_available');
 				}
 				//останавливаем процесс выполнения, т.к. не может работать без кук
-				rutracker::$exucution = FALSE;
+				pornolab::$exucution = FALSE;
 			}
 		}
 	}
