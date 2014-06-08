@@ -106,7 +106,8 @@ class Sys
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . PHP_EOL .
 					'Accept-Language: en-US,en;q=0.5' . PHP_EOL .
 					'Accept-Encoding: deflate' . PHP_EOL .
-					'Cache-Control: max-age=0'
+					'Cache-Control: max-age=0',
+				'max_redirects' => 20
 				)
 			);
 			
@@ -130,14 +131,17 @@ class Sys
 			// Открываем файл с помощью установленных выше HTTP-заголовков
 			$result = file_get_contents($url, false, $context);
 
-			if ($result == FALSE)
+			if ($result == FALSE) {
 				echo 'file_get_contents failed!!!' . PHP_EOL;
+				print 'URL: ' . $url . PHP_EOL;
+				print_r($http_response_header);
+			}
 
     		if (isset($param['convert']))
     			$result = iconv($param['convert'][0], $param['convert'][1], $result);
 
 			// debug
-// 			print 'URL: ' . $url . PHP_EOL;
+ //			print 'URL: ' . $url . PHP_EOL;
 // 			print_r($opts);
 // 			print '===========================================================' . PHP_EOL;
 //  			print 'result: ' . strlen($result) . PHP_EOL;

@@ -66,6 +66,7 @@ class newstudio
 	//функция поиска id torrent-файла
 	private static function findID($link)
 	{
+			$link = str_replace('http://newstud.io', 'http://newstudio.tv', $link);
             $result = Sys::getUrlContent(
 			array(
 				'type'           => 'POST',
