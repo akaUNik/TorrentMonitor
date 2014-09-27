@@ -141,13 +141,13 @@ class Sys
     			$result = iconv($param['convert'][0], $param['convert'][1], $result);
 
 			// debug
- //			print 'URL: ' . $url . PHP_EOL;
-// 			print_r($opts);
-// 			print '===========================================================' . PHP_EOL;
-//  			print 'result: ' . strlen($result) . PHP_EOL;
-//  			print_r($http_response_header);
-// // 			//file_put_contents(time() . '.html', $result);
-//  			print '===========================================================' . PHP_EOL;
+			// print 'URL: ' . $url . PHP_EOL;
+			// print_r($opts);
+			// print '===========================================================' . PHP_EOL;
+			// print 'result: ' . strlen($result) . PHP_EOL;
+			// print_r($http_response_header);
+			// file_put_contents('debug-' . time() . '.html', $result);
+			// print '===========================================================' . PHP_EOL;
 
 			// если необходимы еще заголовки
 			if (isset($param['header']))
@@ -243,7 +243,7 @@ class Sys
 			$forumPage = iconv('windows-1251', 'utf-8//IGNORE', $forumPage);
 
 		if ($tracker == 'tr.anidub.com')
-			$tracker = 'anidub.com';		
+			$tracker = 'anidub.com';
 		preg_match('/<title>(.*)<\/title>/is', $forumPage, $array);
 		if ( ! empty($array[1]))
 		{
@@ -301,39 +301,40 @@ class Sys
 	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
-	    $name = str_replace("'", '', $name);
-    	$file = '['.$tracker.']_'.$name.'.torrent';
-        $path = Database::getSetting('path').$file;
-        file_put_contents($path, $torrent);
+		// $name = str_replace("'", '', $name);
+		// $file = '['.$tracker.']_'.$name.'.torrent';
+		// $path = Database::getSetting('path').$file;
+		// file_put_contents($path, $torrent);
+		
 		// Transmission
-        try
-        {
-            #получаем настройки из базы
-        	$settings = Database::getAllSetting();
+		try
+		{
+			#получаем настройки из базы
+			$settings = Database::getAllSetting();
 			foreach ($settings as $row)
 			{
 				extract($row);
 			}
 
-        	$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
-        	// Add a torrent using the raw torrent data
-    	    $result = $rpc->add_metainfo($torrent);
-    	    print_r($result);
-        } catch (Exception $e) {
-          	//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
-          	print '[ERROR] ' . $e->getMessage() . PHP_EOL;
+			$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
+			// Add a torrent using the raw torrent data
+			$result = $rpc->add_metainfo($torrent);
+			print_r($result);
+		} catch (Exception $e) {
+			//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
+			print '[ERROR] ' . $e->getMessage() . PHP_EOL;
 		}
 
 
-        $torrentClient = Database::getSetting('torrentClient');
-
-        $dir = dirname(__FILE__).'/';
-        include_once $dir.$torrentClient.'.class.php';
-        call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
-
-        $deleteTorrent = Database::getSetting('deleteTorrent');
-        if ($deleteTorrent)
-            unlink($path);
+		// $torrentClient = Database::getSetting('torrentClient');
+		//
+		// $dir = dirname(__FILE__).'/';
+		// include_once $dir.$torrentClient.'.class.php';
+		// call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
+		//
+		// $deleteTorrent = Database::getSetting('deleteTorrent');
+		// if ($deleteTorrent)
+		// unlink($path);
 	}
 
 	//преобразуем месяц из числового в текстовый

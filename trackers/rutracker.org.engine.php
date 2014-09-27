@@ -55,7 +55,7 @@ class rutracker
 		return $date;
 	}
 
-	//функция получения кук
+//функция получения кук
 	protected static function getCookie($tracker)
 	{
 		//проверяем заполнены ли учётные данные
@@ -77,29 +77,25 @@ class rutracker
             		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
             	)
             );
-			file_put_contents('rutracker-getCookie.html', $page);
+
 			if ( ! empty($page))
 			{
+				//проверяем подходят ли учётные данные
+				/*if (preg_match('/profile\.php\?mode=register/', $page, $array))
+				{
+					//устанавливаем варнинг
+					Errors::setWarnings($tracker, 'credential_wrong');
+					//останавливаем процесс выполнения, т.к. не может работать без кук
+					rutracker::$exucution = FALSE;
+				}
 				//если подходят - получаем куки
-<<<<<<< HEAD
-				if (preg_match('/bb_data=(.+);/iU', $page, $array))
-=======
-				elseif (preg_match('/bb_data=.+;/U', $page, $array))
->>>>>>> upstream/master
+				else*/
+				if (preg_match('/bb_data=.+;/iU', $page, $array))
 				{
 					rutracker::$sess_cookie = $array[0];
 					Database::setCookie($tracker, rutracker::$sess_cookie);
 					//запускам процесс выполнения, т.к. не может работать без кук
 					rutracker::$exucution = TRUE;
-				}
-				//проверяем подходят ли учётные данные
-				elseif (preg_match('/profile\.php\?mode=register/', $page, $array))
-				{
-					echo 'credential_wrong!' . PHP_EOL;
-					//устанавливаем варнинг
-					Errors::setWarnings($tracker, 'credential_wrong');
-					//останавливаем процесс выполнения, т.к. не может работать без кук
-					rutracker::$exucution = FALSE;
 				}
 				else
 				{
@@ -199,13 +195,13 @@ class rutracker
                                 );
 								$message = $name.' обновлён.';
 								$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
-								
+
 								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
 								{
 								    $torrentClient = Database::getSetting('torrentClient');
 								    Errors::setWarnings($torrentClient, $status);
 								}
-								
+
 								//обновляем время регистрации торрента в базе
 								Database::setNewDate($id, $date);
 							}

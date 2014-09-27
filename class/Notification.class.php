@@ -18,36 +18,36 @@ class Notification
     		}
     	}
 	}
-	
+
 	public static function send($settingEmail, $date, $tracker, $message, $header_message)
 	{
         $headers = 'From: TorrentMonitor'."\r\n";
 		$headers .= 'MIME-Version: 1.0'."\r\n";
-		$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";	
+		$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";
 		$msg = 'Дата: '.$date.'<br>Трекер: '.$tracker.'<br>Сообщение: '.$message;
-		
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
-			
+
+		//mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
+
 		// send to Prowl
 		try {
 			$api_key = Database::getSetting('prowlKey');
 			$prowl = new Prowl();
 			$prowl->setApiKey($api_key);
-			//$prowl->setDebug(true);
-	
+			$prowl->setDebug(false);
+
 			$application = "TorrentMonitor @ www.burdakov.su";
 			$event = $header_message;
 			$description = $msg;
 			$url = $tracker;
 			$priority = -1;
-	
+
 			$message = $prowl->add($application,$event,$priority,$description,$url);
-			//echo var_dump($message).DEMO_EOL;		
+			//echo var_dump($message).DEMO_EOL;
 		} catch (Exception $message) {
 			echo "Failed: ".$message->getMessage().DEMO_EOL;
-		}	
+		}
 	}
-	
+
 	public static function sendNotification($type, $date, $tracker, $message)
 	{
 		if ($type == 'warning')

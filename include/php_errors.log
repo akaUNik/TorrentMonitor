@@ -1,0 +1,4 @@
+[29-Jan-2014 00:19:08 Asia/Vladivostok] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /usr/home/dmitry/www/www.burdakov.su/htdocs/torrentmonitor/include/show_table.php on line 62
+[29-Jan-2014 00:19:17 Asia/Vladivostok] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /usr/home/dmitry/www/www.burdakov.su/htdocs/torrentmonitor/include/show_table.php on line 62
+[12-Jun-2014 22:46:17 Asia/Vladivostok] PHP Parse error:  syntax error, unexpected '<<' (T_SL) in /usr/home/dmitry/www/www.burdakov.su/htdocs/torrentmonitor/trackers/rutracker.org.engine.php on line 84
+[14-Jul-2014 22:18:24 Asia/Vladivostok] PHP Fatal error:  Class 'ZipArchive' not found in /usr/home/dmitry/www/www.burdakov.su/htdocs/torrentmonitor/include/update.php on line 45
