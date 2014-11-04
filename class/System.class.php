@@ -66,7 +66,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '1.0.1';
+		return '1.0.4';
 	}
 
 	//проверка обновлений системы
@@ -244,7 +244,9 @@ class Sys
 
 		if ($tracker == 'tr.anidub.com')
 			$tracker = 'anidub.com';
-		preg_match('/<title>(.*)<\/title>/is', $forumPage, $array);
+		//preg_match('/<title>(.*)<\/title>/is', $forumPage, $array);
+		preg_match('/<title>(.*)<\/title>/', $forumPage, $array);
+
 		if ( ! empty($array[1]))
 		{
 			if ($tracker == 'anidub.com')
@@ -305,7 +307,7 @@ class Sys
 		// $file = '['.$tracker.']_'.$name.'.torrent';
 		// $path = Database::getSetting('path').$file;
 		// file_put_contents($path, $torrent);
-		
+
 		// Transmission
 		try
 		{
@@ -365,5 +367,19 @@ class Sys
 		$date = date('d-m-Y H:i:s');
 		file_put_contents($dir.'/laststart.txt', $date);
 	}
+
+	//проверяем что файл является torrent-файлом (ну пытаемся)
+	public static function checkTorrentFile($torrent)
+    {
+        if (strlen($torrent) > 100)
+        {
+            if (preg_match('/announce/', $torrent))
+                return TRUE;
+            else
+                return FALSE;
+        }
+        else
+            return FALSE;
+    }
 }
 ?>

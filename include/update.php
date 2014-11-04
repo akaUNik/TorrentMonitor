@@ -67,10 +67,17 @@ class Update {
                             }
                             echo 'Выполнено '.$x.' запросов на обновление.<br>';           
                         }
+                        else
+                            echo 'Не могу разархивировать master.zip<br>';
                     }
+                    else
+                        echo 'Не могу сохранить master.zip<br>';
                 }
+                else
+                    echo 'Не удалось скачать master.zip<br>';
             }
-            echo 'Перейти на <a href="http://'.$_SERVER["HTTP_HOST"].'">главную страницу</a>.';
+            else
+                echo 'Перейти на <a href="http://'.$_SERVER["HTTP_HOST"].'">главную страницу</a>.<br>';
         }
     }
 }
