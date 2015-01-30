@@ -1,7 +1,7 @@
 <?php
 require_once 'TransmissionRPC.class.php';
 class Sys
-{
+{    
 	//проверяем есть ли интернет
 	public static function checkInternet()
 	{
@@ -66,7 +66,7 @@ class Sys
 	//версия системы
 	public static function version()
 	{
-		return '1.0.4';
+		return '1.1';
 	}
 
 	//проверка обновлений системы
@@ -281,21 +281,33 @@ class Sys
 	public static function addToClient($id, $path, $hash, $tracker, $message, $date_str)
 	{
         $torrentClient = Database::getSetting('torrentClient');
+<<<<<<< HEAD
 
+=======
+>>>>>>> upstream/master
         $dir = dirname(__FILE__).'/';
         include_once $dir.$torrentClient.'.class.php';
-        if (call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker))
+        $server = Database::getSetting('serverAddress');
+        $url = $server.$path;
+        $dir = str_replace('class/', '', $dir);
+        $url = str_replace($dir, '', $url);
+        $status = call_user_func($torrentClient.'::addNew', $id, $url, $hash, $tracker);
+        if ($status['status'])
         {
+<<<<<<< HEAD
             $deleteTorrent = Database::getSetting('deleteTorrent');
             if ($deleteTorrent)
                 unlink($path);
 
+=======
+>>>>>>> upstream/master
             Database::deleteFromTemp($id);
             return ' И добавлен в torrent-клиент.';
         }
         else
         {
-            Database::saveToTemp($id, $path, $hash, $tracker, $message, $date_str);
+            Database::saveToTemp($id, $url, $hash, $tracker, $message, $date_str);
+            Errors::setWarnings($torrentClient, $status['msg']);
             return ' Но не добавлен в torrent-клиент и сохраненён.';
         }
 	}
@@ -303,6 +315,7 @@ class Sys
 	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
+<<<<<<< HEAD
 		// $name = str_replace("'", '', $name);
 		// $file = '['.$tracker.']_'.$name.'.torrent';
 		// $path = Database::getSetting('path').$file;
@@ -337,6 +350,21 @@ class Sys
 		// $deleteTorrent = Database::getSetting('deleteTorrent');
 		// if ($deleteTorrent)
 		// unlink($path);
+=======
+	    $name = str_replace("'", '', $name);
+    	$file = '['.$tracker.']_'.$name.'.torrent';
+    	$dir = dirname(__FILE__).'/';
+        $path = str_replace('class/', '', $dir).'torrents/'.$file;
+        unlink($path);
+        file_put_contents($path, $torrent);
+        $messageAdd = ' И сохранён.';
+
+        $useTorrent = Database::getSetting('useTorrent');
+        if ($useTorrent)
+            $messageAdd = Sys::addToClient($id, $path, $hash, $tracker, $message, $date_str);
+        //отправляем уведомлении о новом торренте
+        Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd, $name);
+>>>>>>> upstream/master
 	}
 
 	//преобразуем месяц из числового в текстовый
@@ -380,6 +408,26 @@ class Sys
         }
         else
             return FALSE;
+    }
+    
+    //получаем важные новости и кладём в БД
+    public static function getNews()
+    {
+        //получаем страницу
+        $page = Sys::getUrlContent(
+        	array(
+        		'type'           => 'GET',
+        		'returntransfer' => 1,
+        		'url'            => 'http://korphome.ru/torrent_monitor/news.xml',
+        	)
+        );
+        //читаем xml
+        $page = @simplexml_load_string($page);
+        for ($i=0; $i<count($page->news); $i++)
+        {
+            if ( ! Database::checkNewsExist($page->news[$i]->id))
+                Database::insertNews($page->news[$i]->id, $page->news[$i]->text);
+        }
     }
 }
 ?>

@@ -37,7 +37,7 @@ class kinozal
 	//функция преобразования даты
 	private static function dateStringToNum($data)
 	{
-	    if (strstr($data, 'сегодня') || strstr($data, 'вчера'))
+	    if (strstr($data, 'сегодня') || strstr($data, 'вчера') || strstr($data, 'сейчас'))
 	    {
 	        $pieces = explode(' ', $data);
 	        if ($pieces[0] == 'вчера')
@@ -45,7 +45,10 @@ class kinozal
 	        else         
 	            $timestamp = strtotime('now');
 	        $date = date('Y-m-d', $timestamp);
-	        $time = $pieces[2].':00';
+	        if (strstr($data, 'сейчас'))
+	            $time = date('G:i').':00';
+            else
+	            $time = $pieces[2].':00';
 	        $dateTime = $date.' '.$time;
 
 	        return $dateTime;
@@ -163,7 +166,7 @@ class kinozal
 		}
 	}
 	
-    public static function work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash)
+    public static function work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
     {
 		//проверяем удалось ли получить дату со страницы
 		if (isset($array[1]))
@@ -206,14 +209,15 @@ class kinozal
     					$message = $name.' обновлён.';
     					$status = Sys::saveTorrent($tracker, $torrent_id, $torrent, $id, $hash, $message, $date_str);
 								
-						if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-						{
-						    $torrentClient = Database::getSetting('torrentClient');
-						    Errors::setWarnings($torrentClient, $status);
-						}
-						
     					//обновляем время регистрации торрента в базе
     					Database::setNewDate($id, $date);
+    					
+    					if ($auto_update)
+						{
+						    $name = Sys::getHeader('http://kinozal.tv/details.php?id='.$torrent_id);
+						    //обновляем заголовок торрента в базе
+                            Database::setNewName($id, $name);
+						}
     				}
 				}
 			}
@@ -243,7 +247,7 @@ class kinozal
     }
 	
 	//основная функция
-	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash)
+	public static function main($id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update)
 	{
 		$cookie = Database::getCookie($tracker);
 		if (kinozal::checkCookie($cookie))
@@ -274,9 +278,9 @@ class kinozal
 			{
 				//ищем на странице дату регистрации торрента
 				if (preg_match('/<li>Обновлен<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
+    				kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update);
 				elseif (preg_match('/<li>Залит<span class=\"floatright green n\">(.*)<\/span><\/li>/', $page, $array))
-				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash);
+				    kinozal::work($array, $id, $tracker, $name, $torrent_id, $timestamp, $hash, $auto_update);
 				else
 				{
 					//устанавливаем варнинг
