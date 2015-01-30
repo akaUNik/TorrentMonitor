@@ -1,7 +1,7 @@
 <?php
 require_once 'TransmissionRPC.class.php';
 class Sys
-{    
+{
 	//проверяем есть ли интернет
 	public static function checkInternet()
 	{
@@ -96,6 +96,7 @@ class Sys
     	if (is_array($param))
     	{
 			$url = $param['url'];
+			$url = str_replace('https://', 'http://', $url); //для lostfilm.tv
 
 			$opts = array(
 			  'http' => array(
@@ -103,12 +104,13 @@ class Sys
 				'header' =>
 				  	'Host: ' . parse_url($url, PHP_URL_HOST) . PHP_EOL .
 			  		'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:26.0) Gecko/20100101 Firefox/26.0' . PHP_EOL .
+					//	'Accept: */*' . PHP_EOL .
 					'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8' . PHP_EOL .
 					'Accept-Language: en-US,en;q=0.5' . PHP_EOL .
 					'Accept-Encoding: deflate' . PHP_EOL .
 					'Cache-Control: max-age=0',
 				'max_redirects' => 20
-				)
+			)
 			);
 
 			if (isset($param['referer']))
@@ -126,6 +128,15 @@ class Sys
 				$opts['http']['content'] = $param['postfields'];
     		}
 
+			// ssl
+			// if (parse_url($url, PHP_URL_SCHEME) == 'https')
+			// {
+			// 	$opts['ssl'] => array(
+      //   	'verify_peer'       => true,
+      //   	'allow_self_signed'=> true
+			// 	);
+			// }
+
 			$context = stream_context_create($opts);
 
 			// Открываем файл с помощью установленных выше HTTP-заголовков
@@ -134,6 +145,8 @@ class Sys
 			if ($result == FALSE) {
 				echo 'file_get_contents failed!!!' . PHP_EOL;
 				print 'URL: ' . $url . PHP_EOL;
+				//print_r($opts);
+				//print PHP_EOL;
 				print_r($http_response_header);
 			}
 
@@ -281,10 +294,6 @@ class Sys
 	public static function addToClient($id, $path, $hash, $tracker, $message, $date_str)
 	{
         $torrentClient = Database::getSetting('torrentClient');
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/master
         $dir = dirname(__FILE__).'/';
         include_once $dir.$torrentClient.'.class.php';
         $server = Database::getSetting('serverAddress');
@@ -294,13 +303,6 @@ class Sys
         $status = call_user_func($torrentClient.'::addNew', $id, $url, $hash, $tracker);
         if ($status['status'])
         {
-<<<<<<< HEAD
-            $deleteTorrent = Database::getSetting('deleteTorrent');
-            if ($deleteTorrent)
-                unlink($path);
-
-=======
->>>>>>> upstream/master
             Database::deleteFromTemp($id);
             return ' И добавлен в torrent-клиент.';
         }
@@ -315,56 +317,28 @@ class Sys
 	//сохраняем torrent файл
 	public static function saveTorrent($tracker, $name, $torrent, $id, $hash, $message, $date_str)
 	{
-<<<<<<< HEAD
-		// $name = str_replace("'", '', $name);
-		// $file = '['.$tracker.']_'.$name.'.torrent';
-		// $path = Database::getSetting('path').$file;
-		// file_put_contents($path, $torrent);
 
-		// Transmission
-		try
-		{
-			#получаем настройки из базы
-			$settings = Database::getAllSetting();
-			foreach ($settings as $row)
+			// Transmission
+			try
 			{
-				extract($row);
+				#получаем настройки из базы
+				$settings = Database::getAllSetting();
+				foreach ($settings as $row)
+				{
+					extract($row);
+				}
+
+				$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
+				// Add a torrent using the raw torrent data
+				$result = $rpc->add_metainfo($torrent);
+				print_r($result);
+			} catch (Exception $e) {
+				//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
+				print '[ERROR] ' . $e->getMessage() . PHP_EOL;
 			}
+      //отправляем уведомлении о новом торренте
+      Notification::sendNotification('notification', $date_str, $tracker, $message, $name);
 
-			$rpc = new TransmissionRPC($torrentAddress, $torrentLogin, $torrentPassword);
-			// Add a torrent using the raw torrent data
-			$result = $rpc->add_metainfo($torrent);
-			print_r($result);
-		} catch (Exception $e) {
-			//die('[ERROR] ' . $e->getMessage() . PHP_EOL);
-			print '[ERROR] ' . $e->getMessage() . PHP_EOL;
-		}
-
-
-		// $torrentClient = Database::getSetting('torrentClient');
-		//
-		// $dir = dirname(__FILE__).'/';
-		// include_once $dir.$torrentClient.'.class.php';
-		// call_user_func($torrentClient.'::addNew', $id, $path, $hash, $tracker);
-		//
-		// $deleteTorrent = Database::getSetting('deleteTorrent');
-		// if ($deleteTorrent)
-		// unlink($path);
-=======
-	    $name = str_replace("'", '', $name);
-    	$file = '['.$tracker.']_'.$name.'.torrent';
-    	$dir = dirname(__FILE__).'/';
-        $path = str_replace('class/', '', $dir).'torrents/'.$file;
-        unlink($path);
-        file_put_contents($path, $torrent);
-        $messageAdd = ' И сохранён.';
-
-        $useTorrent = Database::getSetting('useTorrent');
-        if ($useTorrent)
-            $messageAdd = Sys::addToClient($id, $path, $hash, $tracker, $message, $date_str);
-        //отправляем уведомлении о новом торренте
-        Notification::sendNotification('notification', $date_str, $tracker, $message.$messageAdd, $name);
->>>>>>> upstream/master
 	}
 
 	//преобразуем месяц из числового в текстовый
@@ -409,25 +383,25 @@ class Sys
         else
             return FALSE;
     }
-    
+
     //получаем важные новости и кладём в БД
     public static function getNews()
     {
-        //получаем страницу
-        $page = Sys::getUrlContent(
-        	array(
-        		'type'           => 'GET',
-        		'returntransfer' => 1,
-        		'url'            => 'http://korphome.ru/torrent_monitor/news.xml',
-        	)
-        );
-        //читаем xml
-        $page = @simplexml_load_string($page);
-        for ($i=0; $i<count($page->news); $i++)
-        {
-            if ( ! Database::checkNewsExist($page->news[$i]->id))
-                Database::insertNews($page->news[$i]->id, $page->news[$i]->text);
-        }
+        // //получаем страницу
+        // $page = Sys::getUrlContent(
+        // 	array(
+        // 		'type'           => 'GET',
+        // 		'returntransfer' => 1,
+        // 		'url'            => 'http://korphome.ru/torrent_monitor/news.xml',
+        // 	)
+        // );
+        // //читаем xml
+        // $page = @simplexml_load_string($page);
+        // for ($i=0; $i<count($page->news); $i++)
+        // {
+        //     if ( ! Database::checkNewsExist($page->news[$i]->id))
+        //         Database::insertNews($page->news[$i]->id, $page->news[$i]->text);
+        // }
     }
 }
 ?>

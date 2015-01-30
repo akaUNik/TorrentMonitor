@@ -26,6 +26,18 @@ class Notification
 		$headers .= 'Content-type: text/html; charset=utf-8'."\r\n";
 		$msg = 'Дата: '.$date.'<br>Трекер: '.$tracker.'<br>Сообщение: '.$message;
 
+		if ($name != '' || $name != 0)
+		{
+    		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
+    			$msg .= "http://{$tracker}/forum/viewtopic.php?t={$name}";
+    		elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
+        	    $msg .= "http://{$tracker}/details.php?id={$name}";
+    		elseif ($tracker == 'rutor.org')
+    			$msg .= "http://alt.rutor.org/torrent/{$name}/";
+    		elseif ($tracker == 'anidub.com')
+                $msg .= "http://tr.anidub.com/{$name}";
+    }
+
 		//mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
 
 		// send to Prowl
@@ -48,24 +60,6 @@ class Notification
 		}
 	}
 
-	public static function sendNotification($type, $date, $tracker, $message)
-=======
-		$msg = 'Дата: '.$date.'<br>Трекер: '.$tracker.'<br>Сообщение: '.$message."\r\n";
-		if ($name != '' || $name != 0)
-		{
-    		if ($tracker == 'rutracker.org' || $tracker == 'nnm-club.me' || $tracker == 'tfile.me' || $tracker == 'torrents.net.ua' || $tracker == 'pornolab.net' || $tracker == 'rustorka.com')
-    			$msg .= "http://{$tracker}/forum/viewtopic.php?t={$name}";
-    		elseif ($tracker == 'casstudio.tv' || $tracker == 'kinozal.tv'  || $tracker == 'animelayer.ru' || $tracker == 'tracker.0day.kiev.ua')
-        	    $msg .= "http://{$tracker}/details.php?id={$name}";
-    		elseif ($tracker == 'rutor.org')
-    			$msg .= "http://alt.rutor.org/torrent/{$name}/";
-    		elseif ($tracker == 'anidub.com')
-                $msg .= "http://tr.anidub.com/{$name}";
-        }
-
-		mail($settingEmail, '=?UTF-8?B?'.base64_encode("TorrentMonitor: ".$header_message).'?=', $msg, $headers);
-	}
-
 	public static function sendPushover($sendUpdatePushover, $date, $tracker, $message)
 	{
 	    $msg = 'Дата: '.$date."\r\n".'Трекер: '.$tracker."\r\n".'Сообщение: '.$message."\r\n";
@@ -76,13 +70,12 @@ class Notification
         		'header'         => 1,
         		'returntransfer' => 1,
         		'url'            => 'https://api.pushover.net/1/messages.json',
-                'postfields'     => $postfields,
+            'postfields'     => $postfields,
         	)
         );
 	}
 
 	public static function sendNotification($type, $date, $tracker, $message, $name=0)
->>>>>>> upstream/master
 	{
 		if ($type == 'warning')
 			$header_message = 'Предупреждение.';
@@ -106,7 +99,6 @@ class Notification
                         Notification::sendPushover($sendWarningPushover, $date, $tracker, $message, $header_message);
                 }
             }
-
             if ($type == 'notification')
             {
                 $sendUpdate = Database::getSetting('sendUpdate');

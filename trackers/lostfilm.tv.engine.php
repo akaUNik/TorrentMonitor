@@ -44,10 +44,10 @@ class lostfilm
 			lostfilm::$sess_cookie = $array[1][0]."=".$array[2][0]." ".$array[1][1]."=".$array[2][1];
 			$page = Sys::getUrlContent(
 	        	array(
-	        		'type'           => 'GET',
+	        		'type'           => 'POST',
 	        		'header'         => 0,
 	        		'returntransfer' => 1,
-	        		'url'            => 'http://www.lostfilm.tv/my.php',
+	        		'url'            => 'http://lostfilm.tv/my.php',
 	        		'cookie'         => lostfilm::$sess_cookie,
 	        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 	        		'convert'        => array('windows-1251', 'utf-8//IGNORE'),
@@ -264,7 +264,7 @@ class lostfilm
 		//проверяем небыло ли до этого уже ошибок
 		if (empty(lostfilm::$exucution) || (lostfilm::$exucution))
 		{
-
+		    /*
 			//проверяем получена ли уже кука
 			if (empty(lostfilm::$sess_cookie))
 			{
@@ -278,7 +278,7 @@ class lostfilm
         		else
             		lostfilm::getCookie($tracker);
 			}
-
+            */
 
 			lostfilm::$sess_cookie = Database::getCookie($tracker);
 			lostfilm::$exucution = TRUE;
@@ -376,18 +376,14 @@ class lostfilm
 									$amp = 'MP4';
 								else
 									$amp = NULL;
-
-								// если в ссылке нет www. - добавляем чтобы избежать переадресации (HTTP/1.1 302 Moved Temporarily)
-								$serial['link']	= str_replace('http://lostfilm.tv/', 'http://www.lostfilm.tv/', $serial['link']);
-
 								//сохраняем торрент в файл
                                 $torrent = Sys::getUrlContent(
 						        	array(
-						        		'type'           => 'GET',
+						        		'type'           => 'POST',
 						        		'returntransfer' => 1,
 						        		'url'            => $serial['link'],
 						        		'cookie'         => lostfilm::$sess_cookie,
-						        		'sendHeader'     => array('Host' => 'www.lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
+						        		'sendHeader'     => array('Host' => 'lostfilm.tv', 'Content-length' => strlen(lostfilm::$sess_cookie)),
 						        	)
                                 );
 
@@ -399,15 +395,6 @@ class lostfilm
     								$message = $name.' '.$amp.' обновлён до '.$episode.' серии, '.$season.' сезона.';
     								$status = Sys::saveTorrent($tracker, $file, $torrent, $id, $hash, $message, $date_str);
 
-<<<<<<< HEAD
-    								if ($status == 'add_fail' || $status == 'connect_fail' || $status == 'credential_wrong')
-    								{
-    								    $torrentClient = Database::getSetting('torrentClient');
-    								    Errors::setWarnings($torrentClient, $status);
-    								}
-
-=======
->>>>>>> upstream/master
     								//обновляем время регистрации торрента в базе
     								Database::setNewDate($id, $serial['date']);
     								//обновляем сведения о последнем эпизоде
